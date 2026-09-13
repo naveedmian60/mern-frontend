@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+// Yahan https:// aur /api ki spacing theek kar di hai
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://mern-backend-production-44b9.up.railway.app/api', 
 });
 
 // Request interceptor — token attach karo
