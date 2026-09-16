@@ -16,7 +16,7 @@ import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProductForm from './pages/AdminProductForm';
-import ContactReview from './pages/ContactReview';
+
 
 // ═══ Jo pages BANANI HAIN — banane ke baad comment hatao ═══
  import About from './pages/About';
@@ -25,6 +25,7 @@ import ContactReview from './pages/ContactReview';
  import Profile from './pages/Profile';
  import Wishlist from './pages/Wishlist';
  import OrderSuccess from './pages/OrderSuccess';
+ import ContactReview from './pages/ContactReview';
 // import Register from './pages/Register';
 // import ForgetPassword from './pages/ForgetPassword';
 // import VerifyEmail from './pages/VerifyEmail';
@@ -98,7 +99,7 @@ function App() {
         {/* ═══ Protected Routes ═══ */}
         <Route path='/checkout' element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
         <Route path='/my-orders' element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-        <Route path="/contact" element={<ContactReview />} />
+       
 
         {/* ═══ Admin Routes ═══ */}
         <Route path='/admin' element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
@@ -112,6 +113,7 @@ function App() {
          <Route path='/profile' element={<ProtectedRoute><Profile /></ProtectedRoute>} /> 
          <Route path='/wishlist' element={<ProtectedRoute><Wishlist /></ProtectedRoute>} /> 
         <Route path='/order-success' element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+         <Route path="/contact" element={<ContactReview />} />
         {/* <Route path='/register' element={<PublicRoute><Register /></PublicRoute>} /> */}
         {/* <Route path='/forgot-password' element={<ForgetPassword />} /> */}
         {/* <Route path='/verify-email/:token' element={<VerifyEmail />} /> */}
