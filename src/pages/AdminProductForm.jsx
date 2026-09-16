@@ -217,23 +217,23 @@ function AdminProductForm() {
                 <input type="number" name="stock" value={form.stock} onChange={handleChange} placeholder="50" min="0" className={inputClass} />
               </div>
               
-              {/* Custom Mobile-Friendly Dropdown */}
-              <div>
+              {/* Custom Responsive Dropdown for PC & Mobile */}
+              <div className="relative z-10">
                 <label className={labelClass}>Category *</label>
                 <div className="relative" ref={catRef}>
                   <button
                     type="button"
                     onClick={() => setIsCatOpen(!isCatOpen)}
-                    className={`${inputClass} flex items-center justify-between text-left`}
+                    className={`${inputClass} flex items-center justify-between text-left cursor-pointer w-full`}
                   >
                     <span className={form.category ? 'text-white' : 'text-gray-500'}>
                       {form.category || 'Select Category'}
                     </span>
-                    <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isCatOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isCatOpen ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {isCatOpen && (
-                    <div className="absolute z-20 mt-2 w-full bg-[#1a1d27] border border-white/10 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                    <div className="absolute z-50 mt-2 w-full bg-[#1a1d27] border border-white/10 rounded-xl shadow-2xl max-h-60 overflow-y-auto overflow-x-hidden">
                       {categories.map((cat) => (
                         <div
                           key={cat}
