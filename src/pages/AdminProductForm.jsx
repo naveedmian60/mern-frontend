@@ -217,7 +217,7 @@ function AdminProductForm() {
                 <input type="number" name="stock" value={form.stock} onChange={handleChange} placeholder="50" min="0" className={inputClass} />
               </div>
               
-              {/* Custom Responsive Dropdown for PC & Mobile */}
+              {/* Custom Responsive Dropdown - Scrollbar Fixed */}
               <div className="relative z-10">
                 <label className={labelClass}>Category *</label>
                 <div className="relative" ref={catRef}>
@@ -233,7 +233,7 @@ function AdminProductForm() {
                   </button>
                   
                   {isCatOpen && (
-                    <div className="absolute z-50 mt-2 w-full bg-[#1a1d27] border border-white/10 rounded-xl shadow-2xl max-h-60 overflow-y-auto overflow-x-hidden">
+                    <div className="absolute z-50 mt-2 w-full bg-[#1a1d27] border border-white/5 rounded-xl shadow-2xl max-h-60 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
                       {categories.map((cat) => (
                         <div
                           key={cat}
