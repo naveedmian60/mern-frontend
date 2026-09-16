@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import api from '../api/axios';
@@ -15,10 +15,26 @@ function AdminProductForm() {
   const [fetchLoading, setFetchLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  
+  // Custom Dropdown State
+  const [isCatOpen, setIsCatOpen] = useState(false);
+  const catRef = useRef(null);
+  const categories = ['Shoes', 'Electronics', 'Bags', 'Clothing', 'Accessories', 'Sports', 'Watches', 'Skincare', 'Books', 'Kitchen', 'Toys & Games', 'Jewelry', 'Other'];
 
   useEffect(() => {
     if (isEdit) fetchProduct();
   }, [id]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (catRef.current && !catRef.current.contains(e.target)) {
+        setIsCatOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   const fetchProduct = async () => {
     setFetchLoading(true);
@@ -201,33 +217,41 @@ function AdminProductForm() {
                 <input type="number" name="stock" value={form.stock} onChange={handleChange} placeholder="50" min="0" className={inputClass} />
               </div>
               
-              {/* Responsive Category Dropdown with Custom Icon */}
+              {/* Custom Mobile-Friendly Dropdown */}
               <div>
                 <label className={labelClass}>Category *</label>
-                <div className="relative">
-                  <select 
-                    name="category" 
-                    value={form.category} 
-                    onChange={handleChange} 
-                    className={`${inputClass} appearance-none pr-10`} 
-                    required
+                <div className="relative" ref={catRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsCatOpen(!isCatOpen)}
+                    className={`${inputClass} flex items-center justify-between text-left`}
                   >
-                    <option value="" className="bg-[#161922]">Select Category</option>
-                    <option value="Shoes" className="bg-[#161922]">Shoes</option>
-                    <option value="Electronics" className="bg-[#161922]">Electronics</option>
-                    <option value="Bags" className="bg-[#161922]">Bags</option>
-                    <option value="Clothing" className="bg-[#161922]">Clothing</option>
-                    <option value="Accessories" className="bg-[#161922]">Accessories</option>
-                    <option value="Sports" className="bg-[#161922]">Sports</option>
-                    <option value="Watches" className="bg-[#161922]">Watches</option>
-                    <option value="Skincare" className="bg-[#161922]">Skincare</option>
-                    <option value="Books" className="bg-[#161922]">Books</option>
-                    <option value="Kitchen" className="bg-[#161922]">Kitchen</option>
-                    <option value="Toys & Games" className="bg-[#161922]">Toys & Games</option>
-                    <option value="Jewelry" className="bg-[#161922]">Jewelry</option>
-                    <option value="Other" className="bg-[#161922]">Other</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                    <span className={form.category ? 'text-white' : 'text-gray-500'}>
+                      {form.category || 'Select Category'}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isCatOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {isCatOpen && (
+                    <div className="absolute z-20 mt-2 w-full bg-[#1a1d27] border border-white/10 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                      {categories.map((cat) => (
+                        <div
+                          key={cat}
+                          onClick={() => {
+                            setForm({ ...form, category: cat });
+                            setIsCatOpen(false);
+                          }}
+                          className={`px-4 py-3 text-sm cursor-pointer transition-colors ${
+                            form.category === cat 
+                              ? 'bg-indigo-500/20 text-indigo-400 font-medium' 
+                              : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
+                          {cat}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
