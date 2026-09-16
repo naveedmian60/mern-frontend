@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Heart, User, Menu, X, ChevronDown, LogOut, Shield } from 'lucide-react';
+import { Search, ShoppingCart, Heart, User, Menu, X, ChevronDown, LogOut, Shield, Mail } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
 export default function Navbar() {
@@ -81,6 +81,10 @@ export default function Navbar() {
           </Link>
           <Link to="/products" className="text-sm font-medium text-ink/70 transition-colors hover:text-ink">
             Products
+          </Link>
+          {/* Contact Link Added Here */}
+          <Link to="/contact" className="text-sm font-medium text-ink/70 transition-colors hover:text-ink">
+            Contact
           </Link>
 
           {/* Admin Link — sirf admin ko dikhe */}
@@ -177,7 +181,7 @@ export default function Navbar() {
           onClick={() => setMobileOpen(!mobileOpen)}
           className="flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-paper-soft md:hidden"
         >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 h-5" />}
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
@@ -210,25 +214,29 @@ export default function Navbar() {
             <Link to="/products" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-ink transition-colors hover:bg-paper-soft">
               Products
             </Link>
-            {/* 4. Cart */}
+            {/* 4. Contact Added Here */}
+            <Link to="/contact" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-ink transition-colors hover:bg-paper-soft">
+              <Mail className="h-4 w-4" /> Contact Us
+            </Link>
+            {/* 5. Cart */}
             <Link to="/cart" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-ink transition-colors hover:bg-paper-soft">
               <ShoppingCart className="h-4 w-4" /> Cart ({cart.length})
             </Link>
-            {/* 5. Wishlist */}
+            {/* 6. Wishlist */}
             <Link to="/wishlist" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-ink transition-colors hover:bg-paper-soft">
               <Heart className="h-4 w-4" /> Wishlist ({wishlist.length})
             </Link>
-            {/* 6. Profile */}
+            {/* 7. Profile */}
             <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-ink transition-colors hover:bg-paper-soft">
               <User className="h-4 w-4" /> Profile
             </Link>
-            {/* 7. Admin (sirf admin ko dikhe) */}
+            {/* 8. Admin (sirf admin ko dikhe) */}
             {user?.role === 'admin' && (
               <Link to="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-amber-600 transition-colors hover:bg-amber-50">
                 <Shield className="h-4 w-4" /> Admin Dashboard
               </Link>
             )}
-            {/* 8. Logout */}
+            {/* 9. Logout */}
             <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-500 transition-colors hover:bg-red-50">
               <LogOut className="h-4 w-4" /> Logout
             </button>
