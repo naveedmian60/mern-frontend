@@ -16,6 +16,7 @@ import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProductForm from './pages/AdminProductForm';
+import ContactReview from './pages/ContactReview';
 
 // ═══ Jo pages BANANI HAIN — banane ke baad comment hatao ═══
  import About from './pages/About';
@@ -97,6 +98,7 @@ function App() {
         {/* ═══ Protected Routes ═══ */}
         <Route path='/checkout' element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
         <Route path='/my-orders' element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+        <Route path="/contact" element={<ContactReview />} />
 
         {/* ═══ Admin Routes ═══ */}
         <Route path='/admin' element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
