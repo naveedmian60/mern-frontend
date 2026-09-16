@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import api from '../api/axios';
-import { ArrowLeft, Save, Upload, Image, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Image, Sparkles, X, ChevronDown } from 'lucide-react';
 
 function AdminProductForm() {
   const { user, isAuthenticated } = useStore();
@@ -14,6 +14,7 @@ function AdminProductForm() {
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
+  const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
     if (isEdit) fetchProduct();
@@ -36,19 +37,50 @@ function AdminProductForm() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    if (e.target.name === 'image') setImagePreview(e.target.value);
+    if (e.target.name === 'image') {
+      setImagePreview(e.target.value);
+      setImageFile(null);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setForm({ ...form, image: '' });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.price || !form.description || !form.category || !form.image) {
-      alert('Please fill all required fields');
+    if (!form.name || !form.price || !form.description || !form.category || (!form.image && !imageFile)) {
+      alert('Please fill all required fields and provide an image');
       return;
     }
     setLoading(true);
     try {
-      if (isEdit) { await api.put(`/products/${id}`, form); alert('Product updated!'); }
-      else { await api.post('/products', form); alert('Product added!'); }
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        formData.append('name', form.name);
+        formData.append('price', form.price);
+        formData.append('description', form.description);
+        formData.append('category', form.category);
+        formData.append('stock', form.stock);
+        formData.append('brand', form.brand);
+
+        if (isEdit) {
+          await api.put(`/products/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+          alert('Product updated!');
+        } else {
+          await api.post('/products', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+          alert('Product added!');
+        }
+      } else {
+        if (isEdit) { await api.put(`/products/${id}`, form); alert('Product updated!'); }
+        else { await api.post('/products', form); alert('Product added!'); }
+      }
       navigate('/admin');
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to save product');
@@ -98,27 +130,46 @@ function AdminProductForm() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Image Preview Card */}
+          {/* Image Upload & Preview Card */}
           <div className="rounded-2xl bg-[#161922] border border-white/5 p-6">
             <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
               <Image className="w-4 h-4 text-indigo-400" /> Product Image
             </h3>
             <div className="flex flex-col sm:flex-row gap-6">
-              <div className="flex-1">
-                <label className={labelClass}>Image URL *</label>
+              <div className="flex-1 space-y-3">
+                <div>
+                  <label className={labelClass}>Upload from PC (Recommended)</label>
+                  <div className="flex items-center gap-2">
+                    <label className={`flex-1 cursor-pointer ${inputClass} flex items-center gap-2 justify-center hover:bg-white/10`}>
+                      <Upload className="w-4 h-4 text-indigo-400" />
+                      <span>{imageFile ? imageFile.name : 'Choose File'}</span>
+                      <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                    </label>
+                    {imageFile && (
+                      <button type="button" onClick={() => { setImageFile(null); setImagePreview(form.image || ''); }} className="px-3 py-3 rounded-xl border border-white/10 text-red-400 text-sm hover:bg-red-500/10">
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 <div className="relative">
-                  <Upload className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                  <input
-                    type="url"
-                    name="image"
-                    value={form.image}
-                    onChange={handleChange}
-                    placeholder="https://example.com/product-image.jpg"
-                    className={`${inputClass} pl-11`}
-                    required
-                  />
+                  <label className={labelClass}>Or Image URL</label>
+                  <div className="relative">
+                    <Upload className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input
+                      type="url"
+                      name="image"
+                      value={form.image}
+                      onChange={handleChange}
+                      placeholder="https://example.com/image.jpg"
+                      className={`${inputClass} pl-11`}
+                      disabled={!!imageFile}
+                    />
+                  </div>
                 </div>
               </div>
+
               <div className="w-full sm:w-40 shrink-0">
                 <label className={labelClass}>Preview</label>
                 {imagePreview ? (
@@ -149,21 +200,37 @@ function AdminProductForm() {
                 <label className={labelClass}>Stock Quantity</label>
                 <input type="number" name="stock" value={form.stock} onChange={handleChange} placeholder="50" min="0" className={inputClass} />
               </div>
+              
+              {/* Responsive Category Dropdown with Custom Icon */}
               <div>
                 <label className={labelClass}>Category *</label>
-                <select name="category" value={form.category} onChange={handleChange} className={inputClass} required>
-                  <option value="" className="bg-[#161922]">Select Category</option>
-                  <option value="Electronics" className="bg-[#161922]">Electronics</option>
-                  <option value="Clothing" className="bg-[#161922]">Clothing</option>
-                  <option value="Shoes" className="bg-[#161922]">Shoes</option>
-                  <option value="Accessories" className="bg-[#161922]">Accessories</option>
-                  <option value="Home" className="bg-[#161922]">Home & Kitchen</option>
-                  <option value="Beauty" className="bg-[#161922]">Beauty</option>
-                  <option value="Sports" className="bg-[#161922]">Sports</option>
-                  <option value="Books" className="bg-[#161922]">Books</option>
-                  <option value="Other" className="bg-[#161922]">Other</option>
-                </select>
+                <div className="relative">
+                  <select 
+                    name="category" 
+                    value={form.category} 
+                    onChange={handleChange} 
+                    className={`${inputClass} appearance-none pr-10`} 
+                    required
+                  >
+                    <option value="" className="bg-[#161922]">Select Category</option>
+                    <option value="Shoes" className="bg-[#161922]">Shoes</option>
+                    <option value="Electronics" className="bg-[#161922]">Electronics</option>
+                    <option value="Bags" className="bg-[#161922]">Bags</option>
+                    <option value="Clothing" className="bg-[#161922]">Clothing</option>
+                    <option value="Accessories" className="bg-[#161922]">Accessories</option>
+                    <option value="Sports" className="bg-[#161922]">Sports</option>
+                    <option value="Watches" className="bg-[#161922]">Watches</option>
+                    <option value="Skincare" className="bg-[#161922]">Skincare</option>
+                    <option value="Books" className="bg-[#161922]">Books</option>
+                    <option value="Kitchen" className="bg-[#161922]">Kitchen</option>
+                    <option value="Toys & Games" className="bg-[#161922]">Toys & Games</option>
+                    <option value="Jewelry" className="bg-[#161922]">Jewelry</option>
+                    <option value="Other" className="bg-[#161922]">Other</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                </div>
               </div>
+
               <div>
                 <label className={labelClass}>Brand</label>
                 <input type="text" name="brand" value={form.brand} onChange={handleChange} placeholder="e.g. Samsung, Nike" className={inputClass} />
