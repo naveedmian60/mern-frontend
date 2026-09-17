@@ -151,7 +151,7 @@ export default function Products() {
 
       {/* Loading */}
       {loading ? (
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="overflow-hidden rounded-2xl border border-line bg-white">
               <div className="aspect-[4/5] animate-pulse bg-paper-soft" />

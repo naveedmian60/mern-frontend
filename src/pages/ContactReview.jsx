@@ -63,7 +63,7 @@ function ContactReview() {
           </p>
         </div>
 
-        {/* Quick Contact Info Cards */}
+              {/* Quick Contact Info Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <div className="rounded-2xl bg-[#161922] border border-white/5 p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0">
@@ -71,7 +71,7 @@ function ContactReview() {
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider">Email Us</p>
-              <p className="text-sm font-medium text-white truncate">support@shopzone.com</p>
+              <p className="text-sm font-medium text-white truncate">naveedmian0342@gmail.com</p>
             </div>
           </div>
           <div className="rounded-2xl bg-[#161922] border border-white/5 p-5 flex items-center gap-4">
@@ -80,7 +80,7 @@ function ContactReview() {
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider">Call Us</p>
-              <p className="text-sm font-medium text-white">+92 300 1234567</p>
+              <p className="text-sm font-medium text-white">03424760460</p>
             </div>
           </div>
           <div className="rounded-2xl bg-[#161922] border border-white/5 p-5 flex items-center gap-4">
@@ -89,7 +89,7 @@ function ContactReview() {
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider">Visit Us</p>
-              <p className="text-sm font-medium text-white">Main Street, Karachi</p>
+              <p className="text-sm font-medium text-white">Main Street, Faisalabad</p>
             </div>
           </div>
         </div>
