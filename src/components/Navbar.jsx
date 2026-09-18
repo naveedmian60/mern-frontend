@@ -48,8 +48,8 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Search Bar - Desktop */}
-        <form onSubmit={handleSearch} className="hidden md:flex md:flex-1">
+        {/* Search Bar - Desktop Only (lg:block) */}
+        <form onSubmit={handleSearch} className="hidden lg:flex lg:flex-1">
           <div className={`relative w-full max-w-md transition-all duration-300 ${searchFocused ? 'scale-[1.02]' : ''}`}>
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
             <input
@@ -73,8 +73,8 @@ export default function Navbar() {
           </div>
         </form>
 
-        {/* Nav Links + Icons */}
-        <div className="hidden md:flex items-center gap-5">
+        {/* Nav Links + Icons - Desktop Only (lg:flex) */}
+        <div className="hidden lg:flex items-center gap-5">
           <Link to="/" className="text-sm font-medium text-ink/70 transition-colors hover:text-ink">Home</Link>
           <Link to="/about" className="text-sm font-medium text-ink/70 transition-colors hover:text-ink">About</Link>
           <Link to="/products" className="text-sm font-medium text-ink/70 transition-colors hover:text-ink">Products</Link>
@@ -159,18 +159,18 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile/Tablet Menu Toggle - Shows on screens smaller than LG */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-paper-soft md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-paper-soft lg:hidden"
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-      {/* Mobile Menu - Modern & Responsive */}
+      {/* Mobile/Tablet Menu - Shows on screens smaller than LG */}
       {mobileOpen && (
-        <div className="border-t border-line/50 bg-paper px-4 py-6 md:hidden max-h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="border-t border-line/50 bg-paper px-4 py-6 lg:hidden max-h-[calc(100vh-80px)] overflow-y-auto">
           {/* Mobile Search */}
           <form onSubmit={handleSearch} className="mb-6">
             <div className="relative">
