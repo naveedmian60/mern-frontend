@@ -5,6 +5,8 @@ import ProductCard from '../components/ProductCard'
 import QuickViewModal from '../components/QuickViewModal'
 import { ArrowRightIcon } from '../components/Icons'
 import { ChevronDown } from 'lucide-react'
+import { useStore } from '../context/StoreContext'; // Global state import kiya
+
 // ✅ Custom Sort Dropdown Component
 function SortDropdown({ value, onChange }) {
   const [open, setOpen] = useState(false)
@@ -65,13 +67,24 @@ function SortDropdown({ value, onChange }) {
 
 export default function Products() {
   const { category: urlCategory } = useParams()
+  
+  // Global Search State
+  const { searchQuery, setSearchQuery } = useStore();
+  
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [activeCategory, setActiveCategory] = useState(urlCategory || 'All')
   const [sortBy, setSortBy] = useState('default')
   const [quickViewProduct, setQuickViewProduct] = useState(null)
-  const [searchInput, setSearchInput] = useState('')
+  
+  // Local input state sync with global state
+  const [searchInput, setSearchInput] = useState(searchQuery || '');
+
+  // Jab bhi Navbar se searchQuery change ho, toh input bhi update ho
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
 
   useEffect(() => {
     let active = true
@@ -142,7 +155,10 @@ export default function Products() {
             type="text"
             placeholder="Search products..."
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={(e) => { 
+              setSearchInput(e.target.value); 
+              setSearchQuery(e.target.value); // Global state bhi update kare
+            }}
             className="w-full rounded-full border border-line bg-white px-4 py-2.5 text-sm outline-none transition-all focus:border-ink focus:ring-1 focus:ring-ink sm:w-48"
           />
           <SortDropdown value={sortBy} onChange={setSortBy} />
@@ -172,7 +188,11 @@ export default function Products() {
         <div className="mt-8 sm:mt-12 rounded-2xl border border-dashed border-line bg-paper-soft p-8 sm:p-12 text-center">
           <p className="text-sm text-ink/60">No products found in this category.</p>
           <button
-            onClick={() => { setActiveCategory('All'); setSearchInput(''); }}
+            onClick={() => { 
+              setActiveCategory('All'); 
+              setSearchInput(''); 
+              setSearchQuery(''); // Global search bhi clear kare
+            }}
             className="mt-4 text-sm font-medium text-accent hover:underline"
           >
             Clear filters
