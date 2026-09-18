@@ -48,8 +48,8 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Search Bar - Desktop Only (lg:block) */}
-        <form onSubmit={handleSearch} className="hidden lg:flex lg:flex-1">
+        {/* Search Bar - PC Only (xl:block) */}
+        <form onSubmit={handleSearch} className="hidden xl:flex xl:flex-1">
           <div className={`relative w-full max-w-md transition-all duration-300 ${searchFocused ? 'scale-[1.02]' : ''}`}>
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
             <input
@@ -73,8 +73,8 @@ export default function Navbar() {
           </div>
         </form>
 
-        {/* Nav Links + Icons - Desktop Only (lg:flex) */}
-        <div className="hidden lg:flex items-center gap-5">
+        {/* Nav Links + Icons - PC Only (xl:flex) */}
+        <div className="hidden xl:flex items-center gap-5">
           <Link to="/" className="text-sm font-medium text-ink/70 transition-colors hover:text-ink">Home</Link>
           <Link to="/about" className="text-sm font-medium text-ink/70 transition-colors hover:text-ink">About</Link>
           <Link to="/products" className="text-sm font-medium text-ink/70 transition-colors hover:text-ink">Products</Link>
@@ -115,7 +115,7 @@ export default function Navbar() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent">
                   <span className="text-sm font-bold">{user.name?.charAt(0)?.toUpperCase()}</span>
                 </div>
-                <span className="hidden text-sm font-medium text-ink lg:block">
+                <span className="hidden text-sm font-medium text-ink xl:block">
                   {user.name?.split(' ')[0]}
                 </span>
                 <ChevronDown className="h-3.5 w-3.5 text-ink/50" />
@@ -159,18 +159,18 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile/Tablet Menu Toggle - Shows on screens smaller than LG */}
+        {/* Mobile/Tablet Menu Toggle - Shows on screens smaller than XL */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-paper-soft lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-paper-soft xl:hidden"
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-      {/* Mobile/Tablet Menu - Shows on screens smaller than LG */}
+      {/* Mobile/Tablet Menu - Shows on screens smaller than XL */}
       {mobileOpen && (
-        <div className="border-t border-line/50 bg-paper px-4 py-6 lg:hidden max-h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="border-t border-line/50 bg-paper px-4 py-6 xl:hidden max-h-[calc(100vh-80px)] overflow-y-auto">
           {/* Mobile Search */}
           <form onSubmit={handleSearch} className="mb-6">
             <div className="relative">
