@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import api from '../api/axios';
-import { ArrowLeft, Save, Upload, Image, Sparkles, X, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Image, Sparkles, X, ChevronDown, Plus } from 'lucide-react';
 
 function AdminProductForm() {
   const { user, isAuthenticated } = useStore();
@@ -10,7 +10,7 @@ function AdminProductForm() {
   const { id } = useParams();
   const isEdit = Boolean(id);
 
-  const [form, setForm] = useState({ name: '', price: '', description: '', category: '', image: '', stock: '', brand: '' });
+  const [form, setForm] = useState({ name: '', price: '', originalPrice: '', discount: '0', description: '', category: '', image: '', stock: '', brand: '' });
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
@@ -18,18 +18,21 @@ function AdminProductForm() {
   
   // Custom Dropdown State
   const [isCatOpen, setIsCatOpen] = useState(false);
+  const [catSearch, setCatSearch] = useState(''); // For custom category input
   const catRef = useRef(null);
-  const categories = ['Shoes', 'Electronics', 'Bags', 'Clothing', 'Accessories', 'Sports', 'Watches', 'Skincare', 'Books', 'Kitchen', 'Toys & Games', 'Jewelry', 'Other'];
+  
+  // Initial categories (Aap isme aur add bhi kar sakte hain)
+  const [categories, setCategories] = useState(['Shoes', 'Electronics', 'Bags', 'Clothing', 'Accessories', 'Sports', 'Watches', 'Skincare', 'Books', 'Kitchen', 'Toys & Games', 'Jewelry', 'Other']);
 
   useEffect(() => {
     if (isEdit) fetchProduct();
   }, [id]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClick = (e) => {
       if (catRef.current && !catRef.current.contains(e.target)) {
         setIsCatOpen(false);
+        setCatSearch('');
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -41,7 +44,17 @@ function AdminProductForm() {
     try {
       const { data } = await api.get(`/products/${id}`);
       const p = data.product;
-      setForm({ name: p.name, price: p.price.toString(), description: p.description, category: p.category, image: p.image, stock: p.stock?.toString() || '0', brand: p.brand || '' });
+      setForm({ 
+        name: p.name, 
+        price: p.price.toString(), 
+        originalPrice: p.originalPrice?.toString() || '', 
+        discount: p.discount?.toString() || '0', 
+        description: p.description, 
+        category: p.category, 
+        image: p.image, 
+        stock: p.stock?.toString() || '0', 
+        brand: p.brand || '' 
+      });
       setImagePreview(p.image);
     } catch {
       alert('Failed to load product');
@@ -68,6 +81,18 @@ function AdminProductForm() {
     }
   };
 
+  // Custom category add karne ka function
+  const handleAddCustomCategory = () => {
+    if (catSearch.trim() && !categories.includes(catSearch.trim())) {
+      setCategories([...categories, catSearch.trim()]); // List me add karein
+      setForm({ ...form, category: catSearch.trim() }); // Form me set karein
+    } else if (categories.includes(catSearch.trim())) {
+      setForm({ ...form, category: catSearch.trim() });
+    }
+    setCatSearch('');
+    setIsCatOpen(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.price || !form.description || !form.category || (!form.image && !imageFile)) {
@@ -81,6 +106,8 @@ function AdminProductForm() {
         formData.append('image', imageFile);
         formData.append('name', form.name);
         formData.append('price', form.price);
+        formData.append('originalPrice', form.originalPrice);
+        formData.append('discount', form.discount);
         formData.append('description', form.description);
         formData.append('category', form.category);
         formData.append('stock', form.stock);
@@ -126,7 +153,6 @@ function AdminProductForm() {
 
   return (
     <div className="min-h-screen bg-[#0f1117]">
-      {/* Header */}
       <div className="border-b border-white/5 bg-[#161922]/80 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-4 sm:px-8 py-6">
           <div className="flex items-center gap-4">
@@ -146,6 +172,7 @@ function AdminProductForm() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
+          
           {/* Image Upload & Preview Card */}
           <div className="rounded-2xl bg-[#161922] border border-white/5 p-6">
             <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
@@ -154,7 +181,7 @@ function AdminProductForm() {
             <div className="flex flex-col sm:flex-row gap-6">
               <div className="flex-1 space-y-3">
                 <div>
-                  <label className={labelClass}>Upload from PC (Recommended)</label>
+                  <label className={labelClass}>Upload from PC</label>
                   <div className="flex items-center gap-2">
                     <label className={`flex-1 cursor-pointer ${inputClass} flex items-center gap-2 justify-center hover:bg-white/10`}>
                       <Upload className="w-4 h-4 text-indigo-400" />
@@ -168,24 +195,14 @@ function AdminProductForm() {
                     )}
                   </div>
                 </div>
-
                 <div className="relative">
                   <label className={labelClass}>Or Image URL</label>
                   <div className="relative">
                     <Upload className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                    <input
-                      type="url"
-                      name="image"
-                      value={form.image}
-                      onChange={handleChange}
-                      placeholder="https://example.com/image.jpg"
-                      className={`${inputClass} pl-11`}
-                      disabled={!!imageFile}
-                    />
+                    <input type="url" name="image" value={form.image} onChange={handleChange} placeholder="https://example.com/image.jpg" className={`${inputClass} pl-11`} disabled={!!imageFile} />
                   </div>
                 </div>
               </div>
-
               <div className="w-full sm:w-40 shrink-0">
                 <label className={labelClass}>Preview</label>
                 {imagePreview ? (
@@ -208,16 +225,26 @@ function AdminProductForm() {
                 <label className={labelClass}>Product Name *</label>
                 <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="e.g. Wireless Bluetooth Headphones" className={inputClass} required />
               </div>
+              
+              {/* Pricing Section with Discount */}
               <div>
-                <label className={labelClass}>Price (Rs) *</label>
+                <label className={labelClass}>Current Price (Rs) *</label>
                 <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="2999" min="0" className={inputClass} required />
+              </div>
+              <div>
+                <label className={labelClass}>Original Price (Rs) [For Discount]</label>
+                <input type="number" name="originalPrice" value={form.originalPrice} onChange={handleChange} placeholder="4999" min="0" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Discount (%)</label>
+                <input type="number" name="discount" value={form.discount} onChange={handleChange} placeholder="10" min="0" max="100" className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>Stock Quantity</label>
                 <input type="number" name="stock" value={form.stock} onChange={handleChange} placeholder="50" min="0" className={inputClass} />
               </div>
               
-              {/* Custom Responsive Dropdown - Scrollbar Fixed */}
+              {/* Custom Category Dropdown */}
               <div className="relative z-10">
                 <label className={labelClass}>Category *</label>
                 <div className="relative" ref={catRef}>
@@ -227,19 +254,22 @@ function AdminProductForm() {
                     className={`${inputClass} flex items-center justify-between text-left cursor-pointer w-full`}
                   >
                     <span className={form.category ? 'text-white' : 'text-gray-500'}>
-                      {form.category || 'Select Category'}
+                      {form.category || 'Select or Add Category'}
                     </span>
                     <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isCatOpen ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {isCatOpen && (
-                    <div className="absolute z-50 mt-2 w-full bg-[#1a1d27] border border-white/5 rounded-xl shadow-2xl max-h-60 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
+                    <div className="absolute z-50 mt-2 w-full bg-[#1a1d27] border border-white/10 rounded-xl shadow-2xl max-h-60 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
+                      
+                      {/* Existing Categories */}
                       {categories.map((cat) => (
                         <div
                           key={cat}
                           onClick={() => {
                             setForm({ ...form, category: cat });
                             setIsCatOpen(false);
+                            setCatSearch('');
                           }}
                           className={`px-4 py-3 text-sm cursor-pointer transition-colors ${
                             form.category === cat 
@@ -250,6 +280,27 @@ function AdminProductForm() {
                           {cat}
                         </div>
                       ))}
+
+                      {/* Input for New Custom Category */}
+                      <div className="p-2 border-t border-white/10 mt-1 sticky bottom-0 bg-[#1a1d27] rounded-b-xl">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={catSearch}
+                            onChange={(e) => setCatSearch(e.target.value)}
+                            placeholder="Type new category..."
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500"
+                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddCustomCategory(); } }}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleAddCustomCategory}
+                            className="flex items-center justify-center gap-1 bg-indigo-500 hover:bg-indigo-600 text-white px-3 rounded-lg text-xs font-medium transition-colors"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> Add
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
