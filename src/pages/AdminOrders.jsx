@@ -154,7 +154,8 @@ export default function AdminOrders() {
                   {/* Order Items & Total */}
                   <div className="lg:col-span-2">
                     <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Order Items</h4>
-                    <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
+                    {/* Yahan Scrollbar fix karne ke liye class add ki hai */}
+                    <div className="space-y-3 max-h-48 overflow-y-auto overflow-x-hidden pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
                       {order.orderItems.map((item, index) => (
                         <div key={index} className="flex items-center gap-3 bg-[#1a1d27] rounded-lg p-2.5">
                           <img src={item.image} alt={item.name} className="w-10 h-10 rounded-md object-cover border border-white/5" />
