@@ -98,6 +98,10 @@ function AdminDashboard() {
               <Link to="/products" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm font-medium transition-colors">
                 <Eye className="w-4 h-4" /> View Store
               </Link>
+              {/* Orders Link Added Here */}
+              <Link to="/admin/orders" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm font-medium transition-colors">
+                <Package className="w-4 h-4" /> Orders
+              </Link>
 
               <div className="pt-4 mt-4 border-t border-white/5">
                 <p className="px-3 pb-2 text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Stats</p>

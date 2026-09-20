@@ -16,6 +16,7 @@ import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProductForm from './pages/AdminProductForm';
+import AdminOrders from './pages/AdminOrders';
 
 
 // ═══ Jo pages BANANI HAIN — banane ke baad comment hatao ═══
@@ -114,6 +115,7 @@ function App() {
          <Route path='/wishlist' element={<ProtectedRoute><Wishlist /></ProtectedRoute>} /> 
         <Route path='/order-success' element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
          <Route path="/contact" element={<ContactReview />} />
+         <Route path="/admin/orders" element={<AdminOrders />} />
         {/* <Route path='/register' element={<PublicRoute><Register /></PublicRoute>} /> */}
         {/* <Route path='/forgot-password' element={<ForgetPassword />} /> */}
         {/* <Route path='/verify-email/:token' element={<VerifyEmail />} /> */}
