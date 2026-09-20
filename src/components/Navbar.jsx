@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Heart, User, Menu, X, ChevronDown, LogOut, Shield, Mail, Home, Info, Package } from 'lucide-react';
+import { Search, ShoppingCart, Heart, User, Menu, X, ChevronDown, LogOut, Shield, Mail, Home, Info, Package, ClipboardList } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
 export default function Navbar() {
@@ -88,6 +88,11 @@ export default function Navbar() {
 
           <div className="h-5 w-px bg-line"></div>
 
+          {/* My Orders Direct Icon Button */}
+          <Link to="/my-orders" className="relative flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-paper-soft" title="My Orders">
+            <ClipboardList className="h-5 w-5 text-ink/70" />
+          </Link>
+
           <Link to="/wishlist" className="relative flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-paper-soft">
             <Heart className="h-5 w-5 text-ink/70" />
             {wishlist.length > 0 && (
@@ -131,9 +136,8 @@ export default function Navbar() {
                     <Link to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-ink transition-colors hover:bg-paper-soft">
                       <User className="h-4 w-4 text-ink/50" /> My Profile
                     </Link>
-                    {/* My Orders Link Added in Desktop Dropdown */}
                     <Link to="/my-orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-ink transition-colors hover:bg-paper-soft">
-                      <Package className="h-4 w-4 text-ink/50" /> My Orders
+                      <ClipboardList className="h-4 w-4 text-ink/50" /> My Orders
                     </Link>
                     <Link to="/wishlist" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-ink transition-colors hover:bg-paper-soft">
                       <Heart className="h-4 w-4 text-ink/50" /> Wishlist ({wishlist.length})
@@ -218,9 +222,8 @@ export default function Navbar() {
               <span className="flex-1">Wishlist</span>
               {wishlist.length > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{wishlist.length}</span>}
             </Link>
-            {/* My Orders Link Added in Mobile Menu */}
             <Link to="/my-orders" onClick={() => setMobileOpen(false)} className={linkClass}>
-              <Package className="h-5 w-5 text-ink/60" /> My Orders
+              <ClipboardList className="h-5 w-5 text-ink/60" /> My Orders
             </Link>
             <Link to="/profile" onClick={() => setMobileOpen(false)} className={linkClass}>
               <User className="h-5 w-5 text-ink/60" /> Profile
