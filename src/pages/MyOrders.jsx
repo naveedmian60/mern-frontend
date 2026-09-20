@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { useStore } from '../context/StoreContext';
+import { XCircle } from 'lucide-react'; // Cancel icon import kiya
 
 const statusColors = {
   Pending: 'bg-yellow-100 text-yellow-700',
@@ -15,6 +16,7 @@ export default function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null); // Cancel button loading state
 
   useEffect(() => {
     if (user) {
@@ -30,6 +32,21 @@ export default function MyOrders() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Order Cancel karne ka function
+  const handleCancelOrder = async (orderId) => {
+    if (window.confirm('Are you sure you want to cancel this order?')) {
+      setCancellingId(orderId);
+      try {
+        const { data } = await api.put(`/orders/${orderId}/cancel`);
+        setOrders(orders.map(o => o._id === orderId ? data : o));
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to cancel order');
+      } finally {
+        setCancellingId(null);
+      }
     }
   };
 
@@ -98,7 +115,7 @@ export default function MyOrders() {
                 {/* Expanded Content */}
                 {expanded === order._id && (
                   <div className="border-t border-zinc-100 p-4 sm:p-5">
-                    {/* Shipping Info (Backend field name fixed) */}
+                    {/* Shipping Info */}
                     <div className="mb-4">
                       <p className="text-xs text-muted mb-1">Shipping To</p>
                       <p className="text-sm text-primary font-medium">{order.shippingInfo?.fullName}</p>
@@ -106,7 +123,7 @@ export default function MyOrders() {
                       <p className="text-xs text-muted">{order.shippingInfo?.phone}</p>
                     </div>
 
-                    {/* Items (Backend field 'quantity' fixed) */}
+                    {/* Items */}
                     <div className="space-y-3">
                       {order.orderItems?.map((item, i) => (
                         <div key={i} className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl">
@@ -120,12 +137,28 @@ export default function MyOrders() {
                       ))}
                     </div>
 
-                    {/* Price Breakdown (Removed undefined fields) */}
-                    <div className="mt-4 pt-3 border-t border-zinc-100 flex justify-end">
-                      <div className="text-right space-y-1">
+                    {/* Price Breakdown & Cancel Button */}
+                    <div className="mt-4 pt-3 border-t border-zinc-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                      <div className="text-left sm:text-right space-y-1">
                         <p className="text-xs text-muted">Payment Method: {order.paymentMethod}</p>
                         <p className="text-base font-bold text-primary mt-1">Total: Rs {order.totalPrice?.toLocaleString()}</p>
                       </div>
+
+                      {/* Cancel Order Button - Sirf Pending ya Processing par show hoga */}
+                      {(order.status === 'Pending' || order.status === 'Processing') && (
+                        <button 
+                          onClick={() => handleCancelOrder(order._id)} 
+                          disabled={cancellingId === order._id}
+                          className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 text-red-600 px-4 py-2 text-sm font-medium hover:bg-red-100 transition-colors disabled:opacity-50"
+                        >
+                          {cancellingId === order._id ? (
+                            <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <XCircle className="w-4 h-4" />
+                          )}
+                          Cancel Order
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
