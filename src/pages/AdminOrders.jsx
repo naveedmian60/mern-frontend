@@ -1,15 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
-import { ArrowLeft, Package, User, MapPin, CreditCard, Truck, CheckCircle, Clock, XCircle, Loader } from 'lucide-react';
+import { ArrowLeft, Package, User, MapPin, CreditCard, Truck, CheckCircle, Clock, XCircle, Loader, ChevronDown } from 'lucide-react';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [openDropdownId, setOpenDropdownId] = useState(null); // Custom dropdown state
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     fetchOrders();
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpenDropdownId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
   const fetchOrders = async () => {
@@ -25,6 +38,7 @@ export default function AdminOrders() {
 
   const handleStatusChange = async (orderId, newStatus) => {
     setUpdatingStatus(orderId);
+    setOpenDropdownId(null); // Close dropdown on selection
     try {
       await api.put(`/orders/${orderId}/status`, { status: newStatus });
       setOrders(orders.map(o => o._id === orderId ? { ...o, status: newStatus, isPaid: newStatus === 'Delivered' ? true : o.isPaid } : o));
@@ -105,22 +119,31 @@ export default function AdminOrders() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <span className={`px-3 py-1.5 rounded-full text-xs font-medium border flex items-center gap-1.5 ${getStatusStyle(order.status)}`}>
-                      {getStatusIcon(order.status)} {order.status}
-                    </span>
-                    <select 
-                      value={order.status}
-                      onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                      disabled={updatingStatus === order._id}
-                      className="bg-[#1a1d27] border border-white/10 text-white text-xs rounded-lg px-3 py-2 outline-none focus:border-indigo-500 cursor-pointer disabled:opacity-50"
+                  {/* Custom Status Dropdown */}
+                  <div className="relative" ref={openDropdownId === order._id ? dropdownRef : null}>
+                    <button 
+                      onClick={() => setOpenDropdownId(openDropdownId === order._id ? null : order._id)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border cursor-pointer ${getStatusStyle(order.status)}`}
                     >
-                      <option value="Pending" className="bg-[#161922]">Pending</option>
-                      <option value="Processing" className="bg-[#161922]">Processing</option>
-                      <option value="Shipped" className="bg-[#161922]">Shipped</option>
-                      <option value="Delivered" className="bg-[#161922]">Delivered</option>
-                      <option value="Cancelled" className="bg-[#161922]">Cancelled</option>
-                    </select>
+                      {getStatusIcon(order.status)} {order.status}
+                      <ChevronDown className={`w-3 h-3 transition-transform ${openDropdownId === order._id ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {openDropdownId === order._id && (
+                      <div className="absolute right-0 top-full mt-1 w-36 bg-[#1a1d27] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                        {['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].map(status => (
+                          <button
+                            key={status}
+                            onClick={() => handleStatusChange(order._id, status)}
+                            className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+                              order.status === status ? 'bg-indigo-500/20 text-indigo-400 font-medium' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                            }`}
+                          >
+                            {status}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -154,7 +177,6 @@ export default function AdminOrders() {
                   {/* Order Items & Total */}
                   <div className="lg:col-span-2">
                     <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Order Items</h4>
-                    {/* Yahan Scrollbar fix karne ke liye class add ki hai */}
                     <div className="space-y-3 max-h-48 overflow-y-auto overflow-x-hidden pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
                       {order.orderItems.map((item, index) => (
                         <div key={index} className="flex items-center gap-3 bg-[#1a1d27] rounded-lg p-2.5">

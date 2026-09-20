@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import api from '../api/axios';
 import { ArrowLeft, Save, Upload, Image, Sparkles, X, ChevronDown, Plus } from 'lucide-react';
+import { toast } from 'react-toastify'; // Toast import kiya
 
 function AdminProductForm() {
   const { user, isAuthenticated } = useStore();
@@ -18,10 +19,9 @@ function AdminProductForm() {
   
   // Custom Dropdown State
   const [isCatOpen, setIsCatOpen] = useState(false);
-  const [catSearch, setCatSearch] = useState(''); // For custom category input
+  const [catSearch, setCatSearch] = useState('');
   const catRef = useRef(null);
   
-  // Initial categories (Aap isme aur add bhi kar sakte hain)
   const [categories, setCategories] = useState(['Shoes', 'Electronics', 'Bags', 'Clothing', 'Accessories', 'Sports', 'Watches', 'Skincare', 'Books', 'Kitchen', 'Toys & Games', 'Jewelry', 'Other']);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ function AdminProductForm() {
       });
       setImagePreview(p.image);
     } catch {
-      alert('Failed to load product');
+      toast.error('Failed to load product'); // Toast
       navigate('/admin');
     } finally {
       setFetchLoading(false);
@@ -81,11 +81,10 @@ function AdminProductForm() {
     }
   };
 
-  // Custom category add karne ka function
   const handleAddCustomCategory = () => {
     if (catSearch.trim() && !categories.includes(catSearch.trim())) {
-      setCategories([...categories, catSearch.trim()]); // List me add karein
-      setForm({ ...form, category: catSearch.trim() }); // Form me set karein
+      setCategories([...categories, catSearch.trim()]);
+      setForm({ ...form, category: catSearch.trim() });
     } else if (categories.includes(catSearch.trim())) {
       setForm({ ...form, category: catSearch.trim() });
     }
@@ -96,7 +95,7 @@ function AdminProductForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.price || !form.description || !form.category || (!form.image && !imageFile)) {
-      alert('Please fill all required fields and provide an image');
+      toast.warn('Please fill all required fields and provide an image'); // Toast
       return;
     }
     setLoading(true);
@@ -115,18 +114,23 @@ function AdminProductForm() {
 
         if (isEdit) {
           await api.put(`/products/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-          alert('Product updated!');
+          toast.success('Product updated successfully!'); // Toast
         } else {
           await api.post('/products', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-          alert('Product added!');
+          toast.success('Product added successfully!'); // Toast
         }
       } else {
-        if (isEdit) { await api.put(`/products/${id}`, form); alert('Product updated!'); }
-        else { await api.post('/products', form); alert('Product added!'); }
+        if (isEdit) { 
+          await api.put(`/products/${id}`, form); 
+          toast.success('Product updated successfully!'); // Toast
+        } else { 
+          await api.post('/products', form); 
+          toast.success('Product added successfully!'); // Toast
+        }
       }
       navigate('/admin');
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to save product');
+      toast.error(error.response?.data?.message || 'Failed to save product'); // Toast
     } finally {
       setLoading(false);
     }

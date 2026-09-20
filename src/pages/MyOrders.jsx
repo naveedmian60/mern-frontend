@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { useStore } from '../context/StoreContext';
-import { XCircle } from 'lucide-react'; // Cancel icon import kiya
+import { XCircle } from 'lucide-react';
+import { toast } from 'react-toastify'; // Toast import kiya
 
 const statusColors = {
   Pending: 'bg-yellow-100 text-yellow-700',
@@ -16,7 +17,7 @@ export default function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
-  const [cancellingId, setCancellingId] = useState(null); // Cancel button loading state
+  const [cancellingId, setCancellingId] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -42,8 +43,9 @@ export default function MyOrders() {
       try {
         const { data } = await api.put(`/orders/${orderId}/cancel`);
         setOrders(orders.map(o => o._id === orderId ? data : o));
+        toast.success('Order cancelled successfully!'); // Success Toast
       } catch (error) {
-        alert(error.response?.data?.message || 'Failed to cancel order');
+        toast.error(error.response?.data?.message || 'Failed to cancel order'); // Error Toast
       } finally {
         setCancellingId(null);
       }
