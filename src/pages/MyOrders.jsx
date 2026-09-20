@@ -39,35 +39,31 @@ export default function MyOrders() {
     }
   };
 
-  // Order Cancel karne ka function
+  // Order Cancel karne ka function (Alert removed)
   const handleCancelOrder = async (orderId) => {
-    if (window.confirm('Are you sure you want to cancel this order?')) {
-      setCancellingId(orderId);
-      try {
-        const { data } = await api.put(`/orders/${orderId}/cancel`);
-        setOrders(orders.map(o => o._id === orderId ? data : o));
-        toast.success('Order cancelled successfully!');
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to cancel order');
-      } finally {
-        setCancellingId(null);
-      }
+    setCancellingId(orderId);
+    try {
+      const { data } = await api.put(`/orders/${orderId}/cancel`);
+      setOrders(orders.map(o => o._id === orderId ? data : o));
+      toast.success('Order cancelled successfully!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to cancel order');
+    } finally {
+      setCancellingId(null);
     }
   };
 
-  // Order Delete karne ka function (History Clear)
+  // Order Delete karne ka function (Alert removed)
   const handleDeleteOrder = async (orderId) => {
-    if (window.confirm('Remove this order from your history?')) {
-      setDeletingId(orderId);
-      try {
-        await api.delete(`/orders/${orderId}`);
-        setOrders(orders.filter(o => o._id !== orderId));
-        toast.success('Order removed from history');
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to delete order');
-      } finally {
-        setDeletingId(null);
-      }
+    setDeletingId(orderId);
+    try {
+      await api.delete(`/orders/${orderId}`);
+      setOrders(orders.filter(o => o._id !== orderId));
+      toast.success('Order removed from history');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete order');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -191,7 +187,7 @@ export default function MyOrders() {
                           Buy Again
                         </button>
 
-                        {/* Cancel Order Button - Sirf Pending ya Processing par show hoga */}
+                        {/* Cancel Order Button */}
                         {(order.status === 'Pending' || order.status === 'Processing') && (
                           <button 
                             onClick={() => handleCancelOrder(order._id)} 
@@ -207,7 +203,7 @@ export default function MyOrders() {
                           </button>
                         )}
 
-                        {/* Delete History Button - Hamesha show hoga */}
+                        {/* Delete History Button */}
                         <button 
                           onClick={() => handleDeleteOrder(order._id)} 
                           disabled={deletingId === order._id}
