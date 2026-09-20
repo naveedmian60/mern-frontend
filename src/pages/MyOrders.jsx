@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { useStore } from '../context/StoreContext';
-import { XCircle } from 'lucide-react';
-import { toast } from 'react-toastify'; // Toast import kiya
+import { XCircle, Repeat, Trash2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const statusColors = {
   Pending: 'bg-yellow-100 text-yellow-700',
@@ -13,11 +14,13 @@ const statusColors = {
 };
 
 export default function MyOrders() {
-  const { user } = useStore();
+  const { user, addToCart } = useStore();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -43,13 +46,45 @@ export default function MyOrders() {
       try {
         const { data } = await api.put(`/orders/${orderId}/cancel`);
         setOrders(orders.map(o => o._id === orderId ? data : o));
-        toast.success('Order cancelled successfully!'); // Success Toast
+        toast.success('Order cancelled successfully!');
       } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to cancel order'); // Error Toast
+        toast.error(error.response?.data?.message || 'Failed to cancel order');
       } finally {
         setCancellingId(null);
       }
     }
+  };
+
+  // Order Delete karne ka function (History Clear)
+  const handleDeleteOrder = async (orderId) => {
+    if (window.confirm('Remove this order from your history?')) {
+      setDeletingId(orderId);
+      try {
+        await api.delete(`/orders/${orderId}`);
+        setOrders(orders.filter(o => o._id !== orderId));
+        toast.success('Order removed from history');
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to delete order');
+      } finally {
+        setDeletingId(null);
+      }
+    }
+  };
+
+  // Reorder (Buy Again) karne ka function
+  const handleReorder = (order) => {
+    order.orderItems.forEach(item => {
+      addToCart({
+        _id: item.product,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        stock: 100, // Default stock 
+        qty: item.quantity
+      });
+    });
+    toast.success('Items added to cart!');
+    navigate('/cart');
   };
 
   if (loading) {
@@ -139,28 +174,53 @@ export default function MyOrders() {
                       ))}
                     </div>
 
-                    {/* Price Breakdown & Cancel Button */}
+                    {/* Action Buttons */}
                     <div className="mt-4 pt-3 border-t border-zinc-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div className="text-left sm:text-right space-y-1">
                         <p className="text-xs text-muted">Payment Method: {order.paymentMethod}</p>
                         <p className="text-base font-bold text-primary mt-1">Total: Rs {order.totalPrice?.toLocaleString()}</p>
                       </div>
 
-                      {/* Cancel Order Button - Sirf Pending ya Processing par show hoga */}
-                      {(order.status === 'Pending' || order.status === 'Processing') && (
+                      <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                        {/* Buy Again Button */}
                         <button 
-                          onClick={() => handleCancelOrder(order._id)} 
-                          disabled={cancellingId === order._id}
-                          className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 text-red-600 px-4 py-2 text-sm font-medium hover:bg-red-100 transition-colors disabled:opacity-50"
+                          onClick={() => handleReorder(order)} 
+                          className="flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-100 transition-colors"
                         >
-                          {cancellingId === order._id ? (
-                            <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <XCircle className="w-4 h-4" />
-                          )}
-                          Cancel Order
+                          <Repeat className="w-4 h-4" />
+                          Buy Again
                         </button>
-                      )}
+
+                        {/* Cancel Order Button - Sirf Pending ya Processing par show hoga */}
+                        {(order.status === 'Pending' || order.status === 'Processing') && (
+                          <button 
+                            onClick={() => handleCancelOrder(order._id)} 
+                            disabled={cancellingId === order._id}
+                            className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 text-red-600 px-4 py-2 text-sm font-medium hover:bg-red-100 transition-colors disabled:opacity-50"
+                          >
+                            {cancellingId === order._id ? (
+                              <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <XCircle className="w-4 h-4" />
+                            )}
+                            Cancel
+                          </button>
+                        )}
+
+                        {/* Delete History Button - Hamesha show hoga */}
+                        <button 
+                          onClick={() => handleDeleteOrder(order._id)} 
+                          disabled={deletingId === order._id}
+                          className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-600 px-4 py-2 text-sm font-medium hover:bg-zinc-100 transition-colors disabled:opacity-50"
+                        >
+                          {deletingId === order._id ? (
+                              <div className="w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                          Clear
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
