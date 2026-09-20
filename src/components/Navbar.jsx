@@ -131,6 +131,10 @@ export default function Navbar() {
                     <Link to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-ink transition-colors hover:bg-paper-soft">
                       <User className="h-4 w-4 text-ink/50" /> My Profile
                     </Link>
+                    {/* My Orders Link Added in Desktop Dropdown */}
+                    <Link to="/my-orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-ink transition-colors hover:bg-paper-soft">
+                      <Package className="h-4 w-4 text-ink/50" /> My Orders
+                    </Link>
                     <Link to="/wishlist" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-ink transition-colors hover:bg-paper-soft">
                       <Heart className="h-4 w-4 text-ink/50" /> Wishlist ({wishlist.length})
                     </Link>
@@ -213,6 +217,10 @@ export default function Navbar() {
               <Heart className="h-5 w-5 text-ink/60" /> 
               <span className="flex-1">Wishlist</span>
               {wishlist.length > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{wishlist.length}</span>}
+            </Link>
+            {/* My Orders Link Added in Mobile Menu */}
+            <Link to="/my-orders" onClick={() => setMobileOpen(false)} className={linkClass}>
+              <Package className="h-5 w-5 text-ink/60" /> My Orders
             </Link>
             <Link to="/profile" onClick={() => setMobileOpen(false)} className={linkClass}>
               <User className="h-5 w-5 text-ink/60" /> Profile

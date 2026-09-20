@@ -78,7 +78,7 @@ export default function MyOrders() {
                     </div>
                     <div>
                       <p className="text-xs text-muted">Date</p>
-                      <p className="text-sm text-primary">{new Date(order.createdAt).toLocaleDateString('PK', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+                      <p className="text-sm text-primary">{new Date(order.createdAt).toLocaleDateString('en-PK', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
                     </div>
                     <div>
                       <p className="text-xs text-muted">Total</p>
@@ -98,33 +98,32 @@ export default function MyOrders() {
                 {/* Expanded Content */}
                 {expanded === order._id && (
                   <div className="border-t border-zinc-100 p-4 sm:p-5">
-                    {/* Shipping Address */}
+                    {/* Shipping Info (Backend field name fixed) */}
                     <div className="mb-4">
                       <p className="text-xs text-muted mb-1">Shipping To</p>
-                      <p className="text-sm text-primary font-medium">{order.shippingAddress?.fullName}</p>
-                      <p className="text-xs text-muted">{order.shippingAddress?.address}, {order.shippingAddress?.city}, {order.shippingAddress?.postalCode}</p>
-                      <p className="text-xs text-muted">{order.shippingAddress?.phone}</p>
+                      <p className="text-sm text-primary font-medium">{order.shippingInfo?.fullName}</p>
+                      <p className="text-xs text-muted">{order.shippingInfo?.address}, {order.shippingInfo?.city}, {order.shippingInfo?.zipCode}</p>
+                      <p className="text-xs text-muted">{order.shippingInfo?.phone}</p>
                     </div>
 
-                    {/* Items */}
+                    {/* Items (Backend field 'quantity' fixed) */}
                     <div className="space-y-3">
                       {order.orderItems?.map((item, i) => (
                         <div key={i} className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl">
                           <img src={item.image} alt={item.name} className="w-14 h-14 rounded-lg object-cover" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-primary truncate">{item.name}</p>
-                            <p className="text-xs text-muted">Qty: {item.qty} × Rs {item.price?.toLocaleString()}</p>
+                            <p className="text-xs text-muted">Qty: {item.quantity} × Rs {item.price?.toLocaleString()}</p>
                           </div>
-                          <p className="text-sm font-bold text-primary">Rs {(item.price * item.qty)?.toLocaleString()}</p>
+                          <p className="text-sm font-bold text-primary">Rs {(item.price * item.quantity)?.toLocaleString()}</p>
                         </div>
                       ))}
                     </div>
 
-                    {/* Price Breakdown */}
+                    {/* Price Breakdown (Removed undefined fields) */}
                     <div className="mt-4 pt-3 border-t border-zinc-100 flex justify-end">
                       <div className="text-right space-y-1">
-                        <p className="text-xs text-muted">Items: Rs {order.itemsPrice?.toLocaleString()}</p>
-                        <p className="text-xs text-muted">Shipping: Rs {order.shippingPrice?.toLocaleString()}</p>
+                        <p className="text-xs text-muted">Payment Method: {order.paymentMethod}</p>
                         <p className="text-base font-bold text-primary mt-1">Total: Rs {order.totalPrice?.toLocaleString()}</p>
                       </div>
                     </div>

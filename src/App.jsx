@@ -99,7 +99,7 @@ function App() {
 
         {/* ═══ Protected Routes ═══ */}
         <Route path='/checkout' element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-        <Route path='/my-orders' element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+      <Route path="/my-orders" element={<MyOrders />} />
        
 
         {/* ═══ Admin Routes ═══ */}
