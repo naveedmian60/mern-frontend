@@ -123,9 +123,9 @@ function App() {
 
         {/* ═══ Fallback ═══ */}
         <Route path='*' element={<Navigate to='/' replace />} />
-         <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
       </Routes>
       <Footer />
+ <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
     </div>
   );
 }
