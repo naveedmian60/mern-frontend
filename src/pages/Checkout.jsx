@@ -332,11 +332,12 @@ export default function Checkout() {
                 </div>
               )}
 
-              <div className="flex gap-3">
-                <button onClick={() => { setStep(1); setErrors({}); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-2 rounded-full border border-line px-6 py-3.5 text-sm font-medium text-ink transition-all hover:bg-paper-soft">
+              {/* ✅ MOBILE RESPONSIVE BUTTONS */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button onClick={() => { setStep(1); setErrors({}); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full border border-line px-6 py-3.5 text-sm font-medium text-ink transition-all hover:bg-paper-soft">
                   <ArrowLeft className="h-4 w-4" /> Back
                 </button>
-                <button onClick={handlePlaceOrder} disabled={loading} className="flex-1 rounded-full bg-ink py-3.5 text-sm font-medium text-paper transition-all hover:bg-ink/90 flex items-center justify-center gap-2 disabled:opacity-50">
+                <button onClick={handlePlaceOrder} disabled={loading} className="w-full sm:flex-1 rounded-full bg-ink py-3.5 text-sm font-medium text-paper transition-all hover:bg-ink/90 flex items-center justify-center gap-2 disabled:opacity-50">
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-paper/30 border-t-paper rounded-full animate-spin" />
                   ) : (
