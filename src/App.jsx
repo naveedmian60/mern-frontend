@@ -18,19 +18,27 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminProductForm from './pages/AdminProductForm';
 import AdminOrders from './pages/AdminOrders';
 
-
 // ═══ Jo pages BANANI HAIN — banane ke baad comment hatao ═══
- import About from './pages/About';
- import Cart from './pages/Cart';
- import Products from './pages/Products';
- import Profile from './pages/Profile';
- import Wishlist from './pages/Wishlist';
- import OrderSuccess from './pages/OrderSuccess';
- import ContactReview from './pages/ContactReview';
+import About from './pages/About';
+import Cart from './pages/Cart';
+import Products from './pages/Products';
+import Profile from './pages/Profile';
+import Wishlist from './pages/Wishlist';
+import OrderSuccess from './pages/OrderSuccess';
+import ContactReview from './pages/ContactReview';
 // import Register from './pages/Register';
 // import ForgetPassword from './pages/ForgetPassword';
 // import VerifyEmail from './pages/VerifyEmail';
 // import ResendVerification from './pages/ResendVerification';
+
+// ═══ ScrollToTop Component (Naya add kiya) ═══
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0); // Page change hone par scroll sab se upar jayega
+  }, [pathname]);
+  return null;
+}
 
 // ═══ Protected Route (login required) ═══
 function ProtectedRoute({ children }) {
@@ -86,8 +94,9 @@ function PublicRoute({ children }) {
 
 function App() {
   return (
-<div className='min-h-screen bg-surface'>
-        <Navbar />
+    <div className='min-h-screen bg-surface'>
+      <ScrollToTop /> {/* Yahan component ko call kiya gaya hai */}
+      <Navbar />
       <Routes>
         {/* ═══ Public Routes ═══ */}
         <Route path='/' element={<Home />} />
@@ -99,8 +108,7 @@ function App() {
 
         {/* ═══ Protected Routes ═══ */}
         <Route path='/checkout' element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-      <Route path="/my-orders" element={<MyOrders />} />
-       
+        <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
 
         {/* ═══ Admin Routes ═══ */}
         <Route path='/admin' element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
@@ -109,13 +117,13 @@ function App() {
 
         {/* ═══ Naye routes — jab page banao import + route uncomment karo ═══ */}
         <Route path='/about' element={<About />} /> 
-         <Route path='/products' element={<Products />} /> 
+        <Route path='/products' element={<Products />} /> 
         <Route path='/cart' element={<ProtectedRoute><Cart /></ProtectedRoute>} /> 
-         <Route path='/profile' element={<ProtectedRoute><Profile /></ProtectedRoute>} /> 
-         <Route path='/wishlist' element={<ProtectedRoute><Wishlist /></ProtectedRoute>} /> 
+        <Route path='/profile' element={<ProtectedRoute><Profile /></ProtectedRoute>} /> 
+        <Route path='/wishlist' element={<ProtectedRoute><Wishlist /></ProtectedRoute>} /> 
         <Route path='/order-success' element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
-         <Route path="/contact" element={<ContactReview />} />
-         <Route path="/admin/orders" element={<AdminOrders />} />
+        <Route path="/contact" element={<ContactReview />} />
+        <Route path="/admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
         {/* <Route path='/register' element={<PublicRoute><Register /></PublicRoute>} /> */}
         {/* <Route path='/forgot-password' element={<ForgetPassword />} /> */}
         {/* <Route path='/verify-email/:token' element={<VerifyEmail />} /> */}
@@ -125,7 +133,7 @@ function App() {
         <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
       <Footer />
- <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
+      <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
     </div>
   );
 }
