@@ -98,31 +98,44 @@ export function StoreProvider({ children }) {
     }
   }, []);
 
-  // Persist cart to localStorage — only if logged in
+  // Load Cart & Wishlist when auth state changes
   useEffect(() => {
     if (auth.isAuthenticated) {
-      localStorage.setItem('cart', JSON.stringify(cart.items));
-    }
-  }, [cart.items, auth.isAuthenticated]);
-
-  // Persist wishlist to localStorage — only if logged in
-  useEffect(() => {
-    if (auth.isAuthenticated) {
-      localStorage.setItem('wishlist', JSON.stringify(wishlist.items));
-    }
-  }, [wishlist.items, auth.isAuthenticated]);
-
-  // Restore cart/wishlist from localStorage — only after auth is loaded
-  useEffect(() => {
-    if (auth.isAuthenticated) {
+      // Agar login hai toh backend se cart lao
+      const fetchCart = async () => {
+        try {
+          const { data } = await api.get('/cart');
+          dispatchCart({ type: 'LOAD_CART', payload: data.cartItems || [] });
+        } catch (err) {
+          console.error('Failed to fetch cart', err);
+        }
+      };
+      fetchCart();
+    } else {
+      // Agar guest hai toh localStorage se lao
       try {
-        const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const savedCart = JSON.parse(localStorage.getItem('guest_cart') || '[]');
         if (savedCart.length) dispatchCart({ type: 'LOAD_CART', payload: savedCart });
-        const savedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        
+        const savedWishlist = JSON.parse(localStorage.getItem('guest_wishlist') || '[]');
         if (savedWishlist.length) dispatchWishlist({ type: 'LOAD_WISHLIST', payload: savedWishlist });
       } catch { /* ignore */ }
     }
   }, [auth.isAuthenticated]);
+
+  // Persist Guest cart to localStorage
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      localStorage.setItem('guest_cart', JSON.stringify(cart.items));
+    }
+  }, [cart.items, auth.isAuthenticated]);
+
+  // Persist Guest wishlist to localStorage
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      localStorage.setItem('guest_wishlist', JSON.stringify(wishlist.items));
+    }
+  }, [wishlist.items, auth.isAuthenticated]);
 
   const login = async (email, password) => {
     const res = await api.post('/users/login', { email, password });
@@ -130,6 +143,8 @@ export function StoreProvider({ children }) {
     const user = { _id, name, email: userEmail, role };
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
+    localStorage.removeItem('guest_cart'); // Login par guest data clear
+    localStorage.removeItem('guest_wishlist');
     dispatchAuth({ type: 'LOGIN', payload: { user, token } });
     return res.data;
   };
@@ -148,45 +163,53 @@ export function StoreProvider({ children }) {
     dispatchAuth({ type: 'LOGOUT' });
     dispatchCart({ type: 'CLEAR_CART' });
     dispatchWishlist({ type: 'LOAD_WISHLIST', payload: [] });
-    localStorage.removeItem('cart');
-    localStorage.removeItem('wishlist');
   };
 
-  // Protected addToCart — login required
+  // Cart Actions (Backend sync ke sath)
   const addToCart = (product) => {
-    if (!auth.isAuthenticated) {
-      alert('Please login first to add items to cart!');
-      return;
-    }
     dispatchCart({ type: 'ADD_TO_CART', payload: product });
+    if (auth.isAuthenticated) {
+      api.post('/cart', { ...product, qty: 1 }).catch(err => console.error('Cart sync error', err));
+    }
   };
 
-  // Protected toggleWishlist — login required
-  const toggleWishlist = (product) => {
-    if (!auth.isAuthenticated) {
-      alert('Please login first to add items to wishlist!');
-      return;
+  const removeFromCart = (id) => {
+    dispatchCart({ type: 'REMOVE_FROM_CART', payload: id });
+    if (auth.isAuthenticated) {
+      api.delete(`/cart/${id}`).catch(err => console.error('Cart sync error', err));
     }
+  };
+
+  const setCartQty = (id, qty) => {
+    dispatchCart({ type: 'SET_CART_QTY', payload: { id, qty } });
+    if (auth.isAuthenticated) {
+      const product = cart.items.find(i => i._id === id);
+      if (product) {
+        api.post('/cart', { ...product, qty }).catch(err => console.error('Cart sync error', err));
+      }
+    }
+  };
+
+  const clearCart = () => {
+    dispatchCart({ type: 'CLEAR_CART' });
+    if (auth.isAuthenticated) {
+      api.delete('/cart').catch(err => console.error('Cart sync error', err));
+    }
+  };
+
+  // Wishlist Actions (Local state for now)
+  const toggleWishlist = (product) => {
     dispatchWishlist({ type: 'TOGGLE_WISHLIST', payload: product });
   };
 
-  // ✅ addToWishlist — for QuickViewModal (adds only, no toggle)
   const addToWishlist = (product) => {
-    if (!auth.isAuthenticated) {
-      alert('Please login first to add items to wishlist!');
-      return;
-    }
     dispatchWishlist({ type: 'ADD_TO_WISHLIST', payload: product });
   };
 
-  // ✅ removeFromWishlist — for Wishlist page
   const removeFromWishlist = (id) => {
     dispatchWishlist({ type: 'REMOVE_FROM_WISHLIST', payload: id });
   };
 
-  const setCartQty = (id, qty) => dispatchCart({ type: 'SET_CART_QTY', payload: { id, qty } });
-  const clearCart = () => dispatchCart({ type: 'CLEAR_CART' });
-  const removeFromCart = (id) => dispatchCart({ type: 'REMOVE_FROM_CART', payload: id });
   const isInWishlist = (id) => wishlist.items.some((i) => i._id === id);
 
   const cartTotal = cart.items.reduce((sum, i) => sum + i.price * i.qty, 0);
